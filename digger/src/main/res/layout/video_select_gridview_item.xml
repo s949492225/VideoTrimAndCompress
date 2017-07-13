@@ -25,7 +25,7 @@
             android:layout_height="20dip"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/icon_video_unselected"/>
+            android:src="@drawable/video_sel"/>
     </RelativeLayout>
 
     <RelativeLayout

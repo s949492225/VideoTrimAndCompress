@@ -10,7 +10,7 @@ import com.syiyi.digger.R;
 import com.syiyi.digger.holder.VideoViewHolder;
 import com.syiyi.digger.models.VideoInfo;
 
-import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -23,9 +23,9 @@ public class VideoGridViewAdapter extends RecyclerView.Adapter<VideoViewHolder> 
 
     private Context mContext;
     private OnClickListener mListener;
-    private ArrayList<VideoInfo> mDatas;
+    private List<VideoInfo> mDatas;
 
-    VideoGridViewAdapter(Context context, ArrayList<VideoInfo> dataList) {
+    VideoGridViewAdapter(Context context, List<VideoInfo> dataList) {
         this.mContext = context;
         this.mDatas = dataList;
     }

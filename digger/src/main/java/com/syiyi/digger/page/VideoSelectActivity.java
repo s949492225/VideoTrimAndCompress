@@ -25,6 +25,7 @@ import com.syiyi.digger.models.VideoInfo;
 import com.syiyi.digger.util.MediaInfoUtilKt;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import iknow.android.utils.DeviceUtil;
 
@@ -36,7 +37,7 @@ import iknow.android.utils.DeviceUtil;
  */
 public class VideoSelectActivity extends AppCompatActivity {
     private static final int REQUEST_STORAGE_READ_ACCESS_PERMISSION = 101;
-    private ArrayList<VideoInfo> mDatas;
+    private List<VideoInfo> mDatas = new ArrayList<>();
     private TextView mBtnNext;
     private VideoInfo mVideoInfo;
     private VideoGridViewAdapter mAdapter;
@@ -62,25 +63,28 @@ public class VideoSelectActivity extends AppCompatActivity {
         });
         btnSelected(false);
 
-//        requestPermission();
-        requestData();
-    }
-
-    private void requestData() {
-        mDatas = MediaInfoUtilKt.getAllVideoFile(this);
         mAdapter = new VideoGridViewAdapter(this, mDatas);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 4);
-        RecyclerView recyclerView = findViewById(R.id.recycle_view);
-        recyclerView.addItemDecoration(new SpacesItemDecoration(5));
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(mAdapter);
-        recyclerView.setLayoutManager(layoutManager);
         mAdapter.setOnClickListener(new VideoGridViewAdapter.OnClickListener() {
             @Override
             public void onClick(int pos) {
                 refreshData(pos);
             }
         });
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 4);
+        RecyclerView recyclerView = findViewById(R.id.recycle_view);
+        recyclerView.addItemDecoration(new SpacesItemDecoration(5));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(mAdapter);
+        recyclerView.setLayoutManager(layoutManager);
+
+        requestPermission();
+//        requestData();
+    }
+
+    private void requestData() {
+        mDatas.clear();
+        mDatas.addAll(MediaInfoUtilKt.getAllVideoFile(this));
+        mAdapter.notifyDataSetChanged();
     }
 
     private void refreshData(int pos) {
