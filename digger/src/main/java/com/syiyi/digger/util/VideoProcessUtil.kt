@@ -51,17 +51,6 @@ fun trimVideo(context: Context, inputFile:String, outputFile:String, startMs:Lon
 
 }
 
-fun getVideoFilePath(url: String): String {
-    var ret = url
-    if (TextUtils.isEmpty(url) || url.length < 5)
-        return ""
-
-    if (url.substring(0, 4).equals("http", ignoreCase = true)) {
-    } else
-        ret = "file://" + url
-
-    return ret
-}
 
 private fun convertSecondsToTime(seconds: Long): String {
     val timeStr: String?
