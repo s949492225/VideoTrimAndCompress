@@ -6,8 +6,9 @@ package com.syiyi.digger.consts;
  */
 
 public class Constrants {
-    public static final String VIDEO_WIDTH="VIDEO_WIDTH";
-    public static final String VIDEO_HEIGHT="VIDEO_HEIGHT";
-    public static final String VIDEO_DURATION="VIDEO_DURATION";
-    public static final String VIDEO_PATH="VIDEO_PATH";
+    
+    public static final String VIDEO_WIDTH = "VIDEO_WIDTH";
+    public static final String VIDEO_HEIGHT = "VIDEO_HEIGHT";
+    public static final String VIDEO_DURATION = "VIDEO_DURATION";
+    public static final String VIDEO_PATH = "VIDEO_PATH";
 }
