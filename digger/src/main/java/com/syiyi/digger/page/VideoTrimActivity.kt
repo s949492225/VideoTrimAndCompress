@@ -43,7 +43,6 @@ class VideoTrimActivity : AppCompatActivity() {
     }
 
     private fun setUI() {
-
         setUpToolBar()
         setTimeLine()
 

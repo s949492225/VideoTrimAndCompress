@@ -78,7 +78,7 @@ public class TimeLineView extends View {
     }
 
     private void getBitmap(final int viewWidth) {
-        BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0L, "") {
+        BackgroundExecutor.execute(new BackgroundExecutor.Task("calculateThumbList", 0L, "") {
                                        @Override
                                        public void execute() {
                                            try {
@@ -94,11 +94,11 @@ public class TimeLineView extends View {
                                                final int thumbWidth = mHeightView;
                                                final int thumbHeight = mHeightView;
 
-                                               int numThumbs = (int) Math.ceil(((float) viewWidth) / thumbWidth);
+                                               int thumbsNum = (int) Math.ceil(((float) viewWidth) / thumbWidth);
 
-                                               final long interval = videoLengthInMs / numThumbs;
+                                               final long interval = videoLengthInMs / thumbsNum;
 
-                                               for (int i = 0; i < numThumbs; ++i) {
+                                               for (int i = 0; i < thumbsNum; ++i) {
                                                    Bitmap bitmap = mediaMetadataRetriever.getFrameAtTime(i * interval, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
                                                    // TODO: bitmap might be null here, hence throwing NullPointerException. You were right
                                                    try {
@@ -107,10 +107,10 @@ public class TimeLineView extends View {
                                                        e.printStackTrace();
                                                    }
                                                    thumbnailList.put(i, bitmap);
+                                                   setTimeLineBitmap(thumbnailList);
                                                }
 
                                                mediaMetadataRetriever.release();
-                                               returnBitmaps(thumbnailList);
                                            } catch (final Throwable e) {
                                                Thread.getDefaultUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
                                            }
@@ -119,8 +119,8 @@ public class TimeLineView extends View {
         );
     }
 
-    private void returnBitmaps(final LongSparseArray<Bitmap> thumbnailList) {
-        UiThreadExecutor.runTask("", new Runnable() {
+    private void setTimeLineBitmap(final LongSparseArray<Bitmap> thumbnailList) {
+        UiThreadExecutor.runTask("updateTimeLine", new Runnable() {
                     @Override
                     public void run() {
                         mBitmapList = thumbnailList;
@@ -136,14 +136,12 @@ public class TimeLineView extends View {
 
         if (mBitmapList != null) {
             canvas.save();
-            int x = 0;
-
+            int posX = 0;
             for (int i = 0; i < mBitmapList.size(); i++) {
                 Bitmap bitmap = mBitmapList.get(i);
-
                 if (bitmap != null) {
-                    canvas.drawBitmap(bitmap, x, 0, null);
-                    x = x + bitmap.getWidth();
+                    canvas.drawBitmap(bitmap, posX, 0, null);
+                    posX = posX + bitmap.getWidth();
                 }
             }
         }
