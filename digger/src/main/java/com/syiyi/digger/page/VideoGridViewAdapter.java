@@ -29,8 +29,8 @@ import iknow.android.utils.callback.SingleCallback;
  */
 public class VideoGridViewAdapter extends RecyclerView.Adapter<VideoGridViewAdapter.VideoViewHolder> {
 
-    private ArrayList<VideoInfo> mDatas;
     private Context mContext;
+    private ArrayList<VideoInfo> mDatas;
     private SingleCallback<Boolean, VideoInfo> mCallBack;
     private ArrayList<VideoInfo> mVideoSel = new ArrayList<>();
     private ArrayList<ImageView> mSelIconList = new ArrayList<>();
@@ -49,17 +49,15 @@ public class VideoGridViewAdapter extends RecyclerView.Adapter<VideoGridViewAdap
 
     @Override
     public void onBindViewHolder(VideoViewHolder holder, int position) {
-
+        if (mDatas == null) return;
         VideoInfo video = mDatas.get(position);
         holder.durationTv.setText(DateUtil.convertSecondsToTime(video.getDuration() / 1000));
         Glide.with(mContext).load(MediaInfoUtilKt.getVideoFilePath(video.getVideoPath())).into(holder.videoCover);
-//        Bitmap bitmap = createVideoThumbnail(ImageDownloader.Scheme.FILE.crop(TrimVideoUtil.getVideoFilePath(video.getVideoPath())), MediaStore.Images.Thumbnails.MICRO_KIND);
-//        holder.videoCover.setImageBitmap(bitmap);
     }
 
     @Override
     public int getItemCount() {
-        return mDatas.size();
+        return mDatas == null ? 0 : mDatas.size();
     }
 
     void setItemClickCallback(final SingleCallback singleCallback) {
@@ -90,6 +88,7 @@ public class VideoGridViewAdapter extends RecyclerView.Adapter<VideoGridViewAdap
             videoSelectPanel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (mDatas == null) return;
                     VideoInfo videoInfo = mDatas.get(getAdapterPosition());
                     if (mVideoSel.size() > 0) {
                         if (videoInfo.equals(mVideoSel.get(0))) {

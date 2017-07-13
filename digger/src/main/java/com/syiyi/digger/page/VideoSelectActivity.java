@@ -1,15 +1,22 @@
 package com.syiyi.digger.page;
 
+import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.syiyi.digger.R;
 import com.syiyi.digger.consts.Constrains;
@@ -29,23 +36,16 @@ import iknow.android.utils.callback.SingleCallback;
  * Describe:
  */
 public class VideoSelectActivity extends AppCompatActivity {
-    private ArrayList<VideoInfo> mDatas = new ArrayList<>();
+    private static final int REQUEST_STORAGE_READ_ACCESS_PERMISSION = 101;
+    private ArrayList<VideoInfo> mDatas;
     private TextView mBtnNext;
     private VideoInfo mVideoInfo;
+    private VideoGridViewAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.video_select_layout);
-
-        mDatas = MediaInfoUtilKt.getAllVideoFile(this);
-        VideoGridViewAdapter videoGridViewAdapter = new VideoGridViewAdapter(this, mDatas);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 4);
-        RecyclerView recyclerView = findViewById(R.id.recycle_view);
-        recyclerView.addItemDecoration(new SpacesItemDecoration(5));
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(videoGridViewAdapter);
-        recyclerView.setLayoutManager(layoutManager);
 
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(new View.OnClickListener() {
@@ -55,20 +55,74 @@ public class VideoSelectActivity extends AppCompatActivity {
             }
         });
         mBtnNext = findViewById(R.id.next_step);
-        btnSelected(false);
         mBtnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 nextPage();
             }
         });
+        btnSelected(false);
 
-        videoGridViewAdapter.setItemClickCallback(new SingleCallback<Boolean, VideoInfo>() {
+        requestPermission();
+    }
+
+    private void requestData() {
+        mDatas = MediaInfoUtilKt.getAllVideoFile(this);
+        mAdapter = new VideoGridViewAdapter(this, mDatas);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 4);
+        RecyclerView recyclerView = findViewById(R.id.recycle_view);
+        recyclerView.addItemDecoration(new SpacesItemDecoration(5));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(mAdapter);
+        recyclerView.setLayoutManager(layoutManager);
+        mAdapter.setItemClickCallback(new SingleCallback<Boolean, VideoInfo>() {
             @Override
             public void onSingleCallback(Boolean isSelected, VideoInfo video) {
                 selectedItem(isSelected, video);
             }
         });
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private void requestPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, "请求存储权限", REQUEST_STORAGE_READ_ACCESS_PERMISSION);
+        } else {
+            requestData();
+        }
+    }
+
+    private void requestPermission(final String permission, String rationale, final int requestCode) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("权限");
+            builder.setMessage(rationale);
+            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityCompat.requestPermissions(VideoSelectActivity.this, new String[]{permission}, requestCode);
+                }
+            });
+            builder.setNegativeButton("取消", null);
+            builder.show();
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_STORAGE_READ_ACCESS_PERMISSION:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    requestData();
+                } else {
+                    Toast.makeText(this, "存储权限授权失败,请手动设置!", Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     private void selectedItem(boolean selected, VideoInfo video) {
@@ -124,7 +178,9 @@ public class VideoSelectActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        mDatas.clear();
+        if (mDatas != null) {
+            mDatas.clear();
+        }
         super.onDestroy();
     }
 }
