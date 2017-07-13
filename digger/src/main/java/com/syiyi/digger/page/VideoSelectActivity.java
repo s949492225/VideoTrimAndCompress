@@ -27,7 +27,6 @@ import com.syiyi.digger.util.MediaInfoUtilKt;
 import java.util.ArrayList;
 
 import iknow.android.utils.DeviceUtil;
-import iknow.android.utils.callback.SingleCallback;
 
 /**
  * Author：J.Chou
@@ -63,7 +62,8 @@ public class VideoSelectActivity extends AppCompatActivity {
         });
         btnSelected(false);
 
-        requestPermission();
+//        requestPermission();
+        requestData();
     }
 
     private void requestData() {
@@ -75,12 +75,28 @@ public class VideoSelectActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(mAdapter);
         recyclerView.setLayoutManager(layoutManager);
-        mAdapter.setItemClickCallback(new SingleCallback<Boolean, VideoInfo>() {
+        mAdapter.setOnClickListener(new VideoGridViewAdapter.OnClickListener() {
             @Override
-            public void onSingleCallback(Boolean isSelected, VideoInfo video) {
-                selectedItem(isSelected, video);
+            public void onClick(int pos) {
+                refreshData(pos);
             }
         });
+    }
+
+    private void refreshData(int pos) {
+        if (mDatas == null) return;
+        for (int i = 0; i < mDatas.size(); i++) {
+            VideoInfo info = mDatas.get(i);
+            if (pos == i) {
+                if (!info.getSelected()) {
+                    info.setSelected(true);
+                    mVideoInfo = info;
+                    btnSelected(true);
+                }
+            } else {
+                info.setSelected(false);
+            }
+        }
         mAdapter.notifyDataSetChanged();
     }
 
@@ -122,13 +138,6 @@ public class VideoSelectActivity extends AppCompatActivity {
                 break;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    private void selectedItem(boolean selected, VideoInfo video) {
-        if (video != null) {
-            mVideoInfo = video;
-            btnSelected(selected);
         }
     }
 
