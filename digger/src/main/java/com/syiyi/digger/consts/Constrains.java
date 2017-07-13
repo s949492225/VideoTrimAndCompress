@@ -5,8 +5,8 @@ package com.syiyi.digger.consts;
  * Created by songlintao on 2017/7/13.
  */
 
-public class Constrants {
-    
+
+public class Constrains {
     public static final String VIDEO_WIDTH = "VIDEO_WIDTH";
     public static final String VIDEO_HEIGHT = "VIDEO_HEIGHT";
     public static final String VIDEO_DURATION = "VIDEO_DURATION";
