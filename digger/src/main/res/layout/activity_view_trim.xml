@@ -81,7 +81,7 @@
                     android:textColor="#fff"
                     android:textSize="14sp" />
             </LinearLayout>
-
+s
 
             <TextView
                 android:id="@+id/trim_end"
@@ -95,6 +95,7 @@
         </RelativeLayout>
 
         <com.syiyi.digger.widget.TimeLineView
+            android:id="@+id/time_line"
             android:layout_width="match_parent"
             android:layout_height="@dimen/frames_video_height" />
     </LinearLayout>

@@ -2,14 +2,15 @@ package com.syiyi.digger.page
 
 import android.media.MediaPlayer
 import android.net.Uri
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.VideoView
 import com.syiyi.digger.R
 import com.syiyi.digger.consts.Constrains.*
+import com.syiyi.digger.widget.TimeLineView
 import java.io.File
 
 class VideoTrimActivity : AppCompatActivity() {
@@ -44,9 +45,9 @@ class VideoTrimActivity : AppCompatActivity() {
     private fun setUI() {
 
         setUpToolBar()
+        setTimeLine()
 
-
-        mVideoView = findViewById(R.id.video);
+        mVideoView = findViewById(R.id.video)
         mTrimStartText = findViewById(R.id.trim_start)
         mTrimEndText = findViewById(R.id.trim_end)
         mTrimDurationText = findViewById(R.id.trim_duration)
@@ -82,5 +83,10 @@ class VideoTrimActivity : AppCompatActivity() {
 
     private fun setUpToolBar() {
 
+    }
+
+    private fun setTimeLine() {
+        val timeLineView = findViewById<TimeLineView>(R.id.time_line)
+        timeLineView.setVideo(Uri.fromFile(File(mPath)))
     }
 }
