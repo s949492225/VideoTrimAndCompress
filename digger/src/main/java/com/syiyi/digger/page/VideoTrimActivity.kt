@@ -4,10 +4,12 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.VideoView
 import com.syiyi.digger.R
-import com.syiyi.digger.consts.Constrants
+import com.syiyi.digger.consts.Constrains.*
 import java.io.File
 
 class VideoTrimActivity : AppCompatActivity() {
@@ -20,6 +22,8 @@ class VideoTrimActivity : AppCompatActivity() {
     var mTrimStartText: TextView? = null
     var mTrimEndText: TextView? = null
     var mTrimDurationText: TextView? = null
+    var mPlayAction: View? = null
+    var mPlayIcon: ImageView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,28 +35,49 @@ class VideoTrimActivity : AppCompatActivity() {
     }
 
     private fun getVideoInfo() {
-        mDuration = intent.getLongExtra(Constrants.VIDEO_DURATION, 0)
-        mWidth = intent.getIntExtra(Constrants.VIDEO_WIDTH, 0)
-        mHeight = intent.getIntExtra(Constrants.VIDEO_DURATION, 0)
-        mPath = intent.getStringExtra(Constrants.VIDEO_DURATION)
+        mDuration = intent.getLongExtra(VIDEO_DURATION, 0)
+        mWidth = intent.getIntExtra(VIDEO_WIDTH, 0)
+        mHeight = intent.getIntExtra(VIDEO_HEIGHT, 0)
+        mPath = intent.getStringExtra(VIDEO_PATH)
     }
 
     private fun setUI() {
+
+        setUpToolBar()
+
+
         mVideoView = findViewById(R.id.video);
         mTrimStartText = findViewById(R.id.trim_start)
         mTrimEndText = findViewById(R.id.trim_end)
         mTrimDurationText = findViewById(R.id.trim_duration)
+        mPlayAction = findViewById(R.id.play)
+        mPlayIcon = findViewById(R.id.play_icon)
 
-        setUpToolBar()
 
-        mVideoView!!.setOnPreparedListener({
-
+        mPlayAction!!.setOnClickListener({
+            videoPlayOrPause()
         })
 
-        mVideoView!!.setOnCompletionListener { MediaPlayer.OnCompletionListener{
+        mVideoView!!.setOnPreparedListener({
+            mVideoView!!.seekTo(0)
+        })
 
-        } }
+        mVideoView!!.setOnCompletionListener {
+            MediaPlayer.OnCompletionListener {
+
+            }
+        }
         mVideoView!!.setVideoURI(Uri.fromFile(File(mPath)))
+    }
+
+    private fun videoPlayOrPause() {
+        if (mVideoView!!.isPlaying) {
+            mVideoView!!.pause()
+            mPlayIcon!!.visibility = View.VISIBLE
+        } else {
+            mVideoView!!.start()
+            mPlayIcon!!.visibility = View.GONE
+        }
     }
 
     private fun setUpToolBar() {
