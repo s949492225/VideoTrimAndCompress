@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.widget.VideoView
+import com.syiyi.digger.ex.log
 
 /**
  * 自动
@@ -14,17 +15,18 @@ class AutoSeekBar @JvmOverloads constructor(context: Context, attrs: AttributeSe
 
     var video: VideoView? = null
 
-
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         if (video != null && video!!.duration > 0) {
             if (video!!.isPlaying) {
-                val duration: Long = video!!.duration.toLong()
-                val curr: Long = video!!.currentPosition.toLong()
-                val pos = max * (curr / duration).toInt()
-                thumbOffset = pos
+                val duration: Double = video!!.duration.toDouble()
+                val curr: Double = video!!.currentPosition.toDouble()
+                progress = (max * (curr / duration)).toInt()
+                log("xxxxx", "$thumbOffset")
             }
         }
-        postInvalidateDelayed(10)
+        postInvalidate()
+
     }
+
 }

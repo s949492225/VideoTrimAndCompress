@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000"
     android:orientation="vertical"
-    tools:context="com.syiyi.digger.page.VideoTrimActivity"
     tools:ignore="HardcodedText,RtlHardcoded,ContentDescription">
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -82,7 +79,6 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-
             <TextView
                 android:id="@+id/trim_end"
                 android:layout_width="wrap_content"
@@ -96,12 +92,13 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp">
+            android:layout_height="@dimen/frames_video_height">
 
-            <View
+
+            <com.syiyi.digger.widget.TimeLineView
+                android:id="@+id/time_line"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#fff" />
+                android:layout_height="@dimen/frames_video_height" />
 
             <com.syiyi.digger.view.AutoSeekBar
                 android:id="@+id/seek_bar"
@@ -111,6 +108,10 @@
                 android:max="1000"
                 android:progressDrawable="@android:color/transparent"
                 android:secondaryProgress="0" />
+            <com.syiyi.digger.view.RangeSeekBar
+                android:id="@+id/rangeSeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
         </FrameLayout>
 
     </LinearLayout>

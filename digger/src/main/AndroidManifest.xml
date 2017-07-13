@@ -14,6 +14,6 @@
         </activity>
         <activity
             android:name=".page.VideoTrimActivity"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+            android:theme="@style/app_theme_base" />
     </application>
 </manifest>

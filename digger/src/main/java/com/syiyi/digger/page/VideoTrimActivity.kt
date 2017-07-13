@@ -2,15 +2,19 @@ package com.syiyi.digger.page
 
 import android.media.MediaPlayer
 import android.net.Uri
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ImageView
 import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.VideoView
 import com.syiyi.digger.R
 import com.syiyi.digger.consts.Constrains.*
+import com.syiyi.digger.view.AutoSeekBar
+import com.syiyi.digger.view.RangeSeekBar
+import com.syiyi.digger.widget.TimeLineView
 import java.io.File
 
 class VideoTrimActivity : AppCompatActivity() {
@@ -25,7 +29,8 @@ class VideoTrimActivity : AppCompatActivity() {
     var mTrimDurationText: TextView? = null
     var mPlayAction: View? = null
     var mPlayIcon: ImageView? = null
-    var mSeekBar: SeekBar? = null
+    var mSeekBar: AutoSeekBar? = null
+    var mRangeBar: RangeSeekBar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,9 +49,8 @@ class VideoTrimActivity : AppCompatActivity() {
     }
 
     private fun setUI() {
-
         setUpToolBar()
-
+        setTimeLine()
 
         mVideoView = findViewById(R.id.video)
         mTrimStartText = findViewById(R.id.trim_start)
@@ -55,7 +59,25 @@ class VideoTrimActivity : AppCompatActivity() {
         mPlayAction = findViewById(R.id.play)
         mPlayIcon = findViewById(R.id.play_icon)
         mSeekBar = findViewById(R.id.seek_bar)
+        mRangeBar = findViewById(R.id.rangeSeekBar)
 
+        mSeekBar!!.video = mVideoView
+
+        mSeekBar!!.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+            }
+
+            override fun onProgressChanged(p0: SeekBar?, pos: Int, p2: Boolean) {
+                if (mVideoView!!.isPlaying)
+                    return
+                val time = mDuration * (pos.toDouble() / mSeekBar!!.max)
+                mVideoView!!.seekTo(time.toInt())
+            }
+
+        })
 
         mPlayAction!!.setOnClickListener({
             videoPlayOrPause()
@@ -78,13 +100,20 @@ class VideoTrimActivity : AppCompatActivity() {
         if (mVideoView!!.isPlaying) {
             mVideoView!!.pause()
             mPlayIcon!!.visibility = View.VISIBLE
+            mSeekBar!!.isEnabled = true
         } else {
             mVideoView!!.start()
             mPlayIcon!!.visibility = View.GONE
+            mSeekBar!!.isEnabled = false
         }
     }
 
     private fun setUpToolBar() {
 
+    }
+
+    private fun setTimeLine() {
+        val timeLineView = findViewById<TimeLineView>(R.id.time_line)
+        timeLineView.setVideo(Uri.fromFile(File(mPath)))
     }
 }

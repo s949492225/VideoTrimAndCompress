@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="global_grey">#F7F7F7</color>
+    <color name="primary_grey_background">@color/global_grey</color>
+    <color name="primary_status_bar">#000</color>
+
+</resources>
