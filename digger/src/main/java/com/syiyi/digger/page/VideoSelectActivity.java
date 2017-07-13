@@ -1,5 +1,8 @@
 package com.syiyi.digger.page;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -9,12 +12,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.syiyi.digger.R;
+import com.syiyi.digger.consts.Constrains;
 import com.syiyi.digger.decoration.SpacesItemDecoration;
 import com.syiyi.digger.models.VideoInfo;
 import com.syiyi.digger.util.MediaInfoUtilKt;
 
 import java.util.ArrayList;
 
+import iknow.android.utils.DeviceUtil;
 import iknow.android.utils.callback.SingleCallback;
 
 /**
@@ -26,7 +31,7 @@ import iknow.android.utils.callback.SingleCallback;
 public class VideoSelectActivity extends AppCompatActivity {
     private ArrayList<VideoInfo> mDatas = new ArrayList<>();
     private TextView mBtnNext;
-    private String mVideoPath;
+    private VideoInfo mVideoInfo;
 
     @Override
     protected void onCreate(Bundle bundle) {
@@ -54,7 +59,7 @@ public class VideoSelectActivity extends AppCompatActivity {
         mBtnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //                TrimmerActivity.go(VideoSelectActivity.this, mVideoPath);
+                nextPage();
             }
         });
 
@@ -68,7 +73,7 @@ public class VideoSelectActivity extends AppCompatActivity {
 
     private void selectedItem(boolean selected, VideoInfo video) {
         if (video != null) {
-            mVideoPath = video.getVideoPath();
+            mVideoInfo = video;
             btnSelected(selected);
         }
     }
@@ -77,6 +82,44 @@ public class VideoSelectActivity extends AppCompatActivity {
         mBtnNext.setEnabled(selected);
         mBtnNext.setTextAppearance(VideoSelectActivity.this, selected ? R.style
                 .blue_text_18_style : R.style.gray_text_18_style);
+    }
+
+    private void nextPage() {
+        if (mVideoInfo == null) return;
+        Intent intent = new Intent(this, VideoTrimActivity.class);
+        intent.putExtra(Constrains.VIDEO_PATH, mVideoInfo.getVideoPath());
+        intent.putExtra(Constrains.VIDEO_DURATION, mVideoInfo.calcDuration().getDuration());
+        int[] whScale = calculateThumbScale();
+        intent.putExtra(Constrains.VIDEO_WIDTH, whScale[0]);
+        intent.putExtra(Constrains.VIDEO_HEIGHT, whScale[1]);
+        this.startActivity(intent);
+    }
+
+    private int[] calculateThumbScale() {
+        Bitmap bitmap = getThumbBitmap();
+        int deviceWidth = DeviceUtil.getDeviceWidth();
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        double scale = height / THUMB_HEIGHT;
+        if (scale == 0) return new int[]{0, 0};
+        int realWidth = (int) (width / scale);
+        if (realWidth == 0) return new int[]{0, 0};
+
+        int num = deviceWidth % realWidth;
+        if (deviceWidth % realWidth != 0) {
+            num = num + 1;
+        }
+        realWidth = deviceWidth / num;
+        int realHeight = height * realWidth / width;
+        return new int[]{realWidth, realHeight};
+    }
+
+    private final int THUMB_HEIGHT = 50;
+
+    private Bitmap getThumbBitmap() {
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        mediaMetadataRetriever.setDataSource(mVideoInfo.getVideoPath());
+        return mediaMetadataRetriever.getFrameAtTime();
     }
 
     @Override
