@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.syiyi.digger.page
 
 import android.graphics.BitmapFactory
@@ -19,10 +21,10 @@ import com.syiyi.digger.widget.VideoView
 import java.io.File
 import android.app.ProgressDialog
 import com.syiyi.digger.ex.FileEx
-import com.syiyi.digger.ex.log
 import com.syiyi.digger.util.*
 
 
+@Suppress("DEPRECATION")
 class VideoTrimActivity : AppCompatActivity() {
     var mDuration: Long = 0
     var mWidth: Int = 0
@@ -51,7 +53,10 @@ class VideoTrimActivity : AppCompatActivity() {
     }
 
     private fun getVideoInfo() {
+        mDuration = intent.getLongExtra(VIDEO_DURATION, 0)
+        mHeight = intent.getIntExtra(VIDEO_HEIGHT, 0)
         mPath = intent.getStringExtra(VIDEO_PATH)
+
     }
 
     private fun setUI() {
@@ -102,6 +107,10 @@ class VideoTrimActivity : AppCompatActivity() {
         mSeekBar!!.visibility = View.INVISIBLE
         mSeekBar!!.progress = 0
 
+        mVideoView!!.setOnCompletionListener {
+            mSeekBar!!.progress = mCurrentStart.toInt()
+            mVideoView!!.seekTo(mCurrentStart.toInt())
+        }
         mVideoView!!.setVideoPlayLister(object : VideoView.OnVideoPlayListener {
             override fun onPause() {
                 setVisibility(mPlayIcon!!, View.VISIBLE)
@@ -111,8 +120,8 @@ class VideoTrimActivity : AppCompatActivity() {
             override fun onPlay(currentPosition: Int) {
                 if (currentPosition >= mCurrentEnd) {
                     mSeekBar!!.progress = mCurrentStart.toInt()
-                    mVideoView!!.pause()
                     mVideoView!!.seekTo(mCurrentStart.toInt())
+                    mVideoView!!.pause()
                 } else {
                     mSeekBar!!.progress = currentPosition
                     setVisibility(mPlayIcon!!, View.INVISIBLE)
@@ -124,11 +133,10 @@ class VideoTrimActivity : AppCompatActivity() {
 
 
         mRangeBar!!.setRangeChangeListener { startPercent, endPercent, selectPercent ->
-            log("xxx", "$startPercent")
             mCurrentStart = (mDuration * startPercent).toLong()
             mCurrentEnd = (mDuration * endPercent).toLong()
-            mVideoView!!.pause()
             mVideoView!!.seekTo(mCurrentStart.toInt())
+            mVideoView!!.pause()
             mSeekBar!!.progress = mCurrentStart.toInt()
             setStartTime(mCurrentStart)
             setEndTime(mCurrentEnd)

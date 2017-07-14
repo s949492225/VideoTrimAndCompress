@@ -26,20 +26,22 @@ package com.syiyi.digger.widget;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.LongSparseArray;
 import android.view.View;
+
 import iknow.android.utils.thread.BackgroundExecutor;
 import iknow.android.utils.thread.UiThreadExecutor;
+import wseemann.media.FFmpegMediaMetadataRetriever;
 
 public class TimeLineView extends View {
 
     private Uri mVideoUri;
     private int mHeightView;
-    private int mWidth;
     private LongSparseArray<Bitmap> mBitmapList = null;
 
     public TimeLineView(@NonNull Context context, AttributeSet attrs) {
@@ -63,8 +65,7 @@ public class TimeLineView extends View {
         int h = resolveSizeAndState(minH, heightMeasureSpec, 1);
 
         setMeasuredDimension(w, h);
-        mWidth=getMeasuredWidth();
-        mHeightView=getMeasuredHeight();
+        mHeightView = getMeasuredHeight();
     }
 
     @Override
@@ -83,35 +84,45 @@ public class TimeLineView extends View {
                                            try {
                                                LongSparseArray<Bitmap> thumbnailList = new LongSparseArray<>();
 
-                                               MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+                                               MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                                               retriever.setDataSource(getContext(), mVideoUri);
+                                               int rotation = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION));
+
+                                               FFmpegMediaMetadataRetriever mediaMetadataRetriever = new FFmpegMediaMetadataRetriever();
                                                mediaMetadataRetriever.setDataSource(getContext(), mVideoUri);
 
                                                // Retrieve media data
-                                               long videoLengthInMs = Integer.valueOf(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))* 1000;
+                                               long videoLengthInMs = Integer.valueOf(mediaMetadataRetriever.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION)) * 1000;
+
+                                               Matrix matrix0 = new Matrix();
+                                               matrix0.postRotate(rotation);
                                                Bitmap bitmap = mediaMetadataRetriever.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+                                               bitmap = Bitmap.createBitmap(bitmap, 0, 0,
+                                                       bitmap.getWidth(), bitmap.getHeight(), matrix0, false);
 
-                                               final int bitmapWidth= bitmap.getWidth();
-                                               final int bitmapHeight= bitmap.getHeight();
+                                               final int bitmapWidth = bitmap.getWidth();
+                                               final int bitmapHeight = bitmap.getHeight();
 
-                                               final int thumbHeight = mHeightView;
-                                               int thumbWidth = (int) (mHeightView*1.0/bitmapHeight*bitmapWidth);
+                                               float scale = mHeightView * 1.0f / bitmapHeight;
 
-                                               int thumbsNum = (int) Math.ceil(((float) viewWidth) / thumbWidth);
 
-                                               thumbWidth=mWidth/thumbsNum;
+                                               int thumbWidth = (int) (scale * bitmapWidth);
+
+                                               int thumbsNum = (int) (viewWidth*1.0f / thumbWidth*1+ 2);
 
                                                final long interval = videoLengthInMs / thumbsNum;
 
+                                               Matrix matrix = new Matrix();
+                                               matrix.postScale(scale, scale);
+                                               matrix.postRotate(rotation);
+
                                                for (int i = 0; i < thumbsNum; ++i) {
-                                                   if (i!=0) {
-                                                       bitmap = mediaMetadataRetriever.getFrameAtTime(i * interval, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
-                                                   }
+
+                                                   bitmap = mediaMetadataRetriever.getFrameAtTime(i * interval, FFmpegMediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+
                                                    try {
-                                                       if (i==thumbsNum-1){
-                                                           bitmap = Bitmap.createScaledBitmap(bitmap, mWidth-thumbWidth*(thumbsNum-1), thumbHeight, false);
-                                                       }else {
-                                                           bitmap = Bitmap.createScaledBitmap(bitmap, thumbWidth, thumbHeight, false);
-                                                       }
+                                                       bitmap = Bitmap.createBitmap(bitmap, 0, 0,
+                                                               bitmap.getWidth(), bitmap.getHeight(), matrix, false);
                                                    } catch (Exception e) {
                                                        e.printStackTrace();
                                                    }
@@ -119,6 +130,7 @@ public class TimeLineView extends View {
                                                    setTimeLineBitmap(thumbnailList);
                                                }
 
+                                               retriever.release();
                                                mediaMetadataRetriever.release();
 
 
@@ -129,6 +141,7 @@ public class TimeLineView extends View {
                                    }
         );
     }
+
 
     private void setTimeLineBitmap(final LongSparseArray<Bitmap> thumbnailList) {
         UiThreadExecutor.runTask("updateTimeLine", new Runnable() {
