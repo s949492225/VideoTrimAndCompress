@@ -90,10 +90,30 @@
                 android:textSize="12sp" />
         </RelativeLayout>
 
-        <com.syiyi.digger.widget.TimeLineView
-            android:id="@+id/time_line"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/frames_video_height" />
+            android:layout_height="@dimen/frames_video_height">
+
+
+            <com.syiyi.digger.widget.TimeLineView
+                android:id="@+id/time_line"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/frames_video_height" />
+
+            <com.syiyi.digger.view.AutoSeekBar
+                android:id="@+id/seek_bar"
+                style="@style/Video_Trim_SeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:max="1000"
+                android:progressDrawable="@android:color/transparent"
+                android:secondaryProgress="0" />
+            <com.syiyi.digger.view.RangeSeekBar
+                android:id="@+id/rangeSeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+
     </LinearLayout>
 
     <RelativeLayout
