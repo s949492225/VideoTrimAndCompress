@@ -40,6 +40,7 @@ import iknow.android.utils.thread.UiThreadExecutor;
 
 public class TimeLineView extends View {
     private final int DOUBLE_TIMES = 2;
+
     private Uri mVideoUri;
     private int mHeightView;
     private LongSparseArray<Bitmap> mBitmapList = null;
