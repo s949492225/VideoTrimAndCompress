@@ -10,13 +10,18 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import com.syiyi.digger.R
 import com.syiyi.digger.consts.Constrains.*
-import com.syiyi.digger.util.DeviceUtil
+import com.syiyi.digger.init.Digger
 import com.syiyi.digger.widget.RangeSeekBar
 import com.syiyi.digger.widget.TimeLineView
 import com.syiyi.digger.widget.VideoView
 import java.io.File
+import android.app.ProgressDialog
+import com.syiyi.digger.ex.FileEx
+import com.syiyi.digger.util.*
+
 
 class VideoTrimActivity : AppCompatActivity() {
     var mDuration: Long = 0
@@ -72,8 +77,11 @@ class VideoTrimActivity : AppCompatActivity() {
         mVideoView!!.setOnPreparedListener({
             mVideoView!!.seekTo(0)
             mSeekBar!!.max = mVideoView!!.duration
+            mCurrentStart = 0
             mCurrentEnd = mVideoView!!.duration.toLong()
             mDuration = mVideoView!!.duration.toLong()
+            setEndTime(mDuration)
+            setSelectTimeSum(mDuration)
         })
 
 
@@ -97,8 +105,11 @@ class VideoTrimActivity : AppCompatActivity() {
         params.leftMargin = width
         params.rightMargin = width
         mSeekBar!!.layoutParams = params
-
         mSeekBar!!.isEnabled = false
+        mSeekBar!!.setPadding(0, 0, 0, 0)
+        mSeekBar!!.visibility = View.INVISIBLE
+        mSeekBar!!.progress = 0
+
         mVideoView!!.setVideoPlayLister(object : VideoView.OnVideoPlayListener {
             override fun onPlay(currentPosition: Int) {
                 if (currentPosition >= mCurrentEnd) {
@@ -122,7 +133,22 @@ class VideoTrimActivity : AppCompatActivity() {
             setVisibility(mPlayIcon!!, View.VISIBLE)
             setVisibility(mSeekBar!!, View.INVISIBLE)
             mVideoView!!.seekTo(mCurrentStart.toInt())
+            setStartTime(mCurrentStart)
+            setEndTime(mCurrentEnd)
+            setSelectTimeSum((selectPercent * mDuration).toLong())
         }
+    }
+
+    private fun setStartTime(time: Long) {
+        mTrimStartText!!.text = TimeUtil.formatTime(time)
+    }
+
+    private fun setEndTime(time: Long) {
+        mTrimEndText!!.text = TimeUtil.formatTime(time)
+    }
+
+    private fun setSelectTimeSum(time: Long) {
+        mTrimDurationText!!.text = TimeUtil.formatSumTime(time)
     }
 
     private fun videoPlayOrPause() {
@@ -144,6 +170,59 @@ class VideoTrimActivity : AppCompatActivity() {
     }
 
     private fun setUpToolBar() {
+        findViewById<View>(R.id.back).
+                setOnClickListener {
+                    onBackPressed()
+                }
+
+        findViewById<View>(R.id.confirm)
+                .setOnClickListener {
+                    confirm()
+                }
+    }
+
+    private fun confirm() {
+        val time = (mCurrentEnd - mCurrentStart) / 1000
+        if (time < VIDEO_MIN_LENGTH) {
+            Toast.makeText(this, "截取的视频不能小于10秒！", Toast.LENGTH_LONG).show()
+            return
+        }
+        mVideoView!!.pause()
+        val dialog = ProgressDialog(this)
+        dialog.setTitle("提醒")
+        dialog.setMessage("正在裁剪,请稍后...")
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
+        dialog.max = 100
+        dialog.setCancelable(false)
+
+        trimVideo(this, mPath, Digger.mOutputPath, mCurrentStart, mCurrentEnd, mDuration, object : FFmpegCallBck {
+
+            override fun onFinish(path: String) {
+                compressVideo(this@VideoTrimActivity, path, mWidth, mHeight, Digger.mOutputPath, mDuration, object : FFmpegCallBck {
+                    override fun onFinish(output: String?) {
+                        dialog.dismiss()
+                        FileEx.delete(path)
+                    }
+
+                    override fun onProgress(msg: Int) {
+                        dialog.progress = msg
+                    }
+
+                    override fun onStart() {
+                        dialog.setMessage("正在压缩,请稍后...")
+                    }
+                })
+            }
+
+            override fun onStart() {
+                dialog.show()
+                dialog.progress = 0
+            }
+
+            override fun onProgress(msg: Int) {
+                dialog.progress = msg
+            }
+        })
 
     }
 
@@ -157,7 +236,6 @@ class VideoTrimActivity : AppCompatActivity() {
         params.rightMargin = width
         timeLineView.layoutParams = params
         timeLineView.setVideo(Uri.fromFile(File(mPath)))
-
     }
 
 }

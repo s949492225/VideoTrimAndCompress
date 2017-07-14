@@ -1,8 +1,11 @@
 package com.syiyi.video;
 
 import android.app.Application;
+import android.os.Environment;
 
 import com.syiyi.digger.init.Digger;
+
+import java.io.File;
 
 import iknow.android.utils.BaseUtils;
 
@@ -16,7 +19,8 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Digger.init(this);
+        String path = Environment.getExternalStorageDirectory().getPath() + "/a/";
+        Digger.init(this, new File(path));
         BaseUtils.init(this);
     }
 }

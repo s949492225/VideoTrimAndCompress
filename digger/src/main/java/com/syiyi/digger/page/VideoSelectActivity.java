@@ -178,7 +178,7 @@ public class VideoSelectActivity extends AppCompatActivity {
         }
         realWidth = deviceWidth / num;
         int realHeight = height * realWidth / width;
-        return new int[]{realWidth, realHeight};
+        return new int[]{width, height};
     }
 
     private final int THUMB_HEIGHT = 50;

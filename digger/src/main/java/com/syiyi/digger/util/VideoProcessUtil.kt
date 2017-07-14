@@ -4,18 +4,17 @@ import android.content.Context
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException
 import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg
-import java.text.SimpleDateFormat
+import com.syiyi.digger.ex.log
 import java.util.*
-import android.text.TextUtils
 
 
 /**
- * 视频压缩
+ * 视频裁剪
  */
-fun trimVideo(context: Context, inputFile:String, outputFile:String, startMs:Long, endMs:Long,callback:TrimCallBck){
+fun trimVideo(context: Context, inputFile: String, outputFile: String, startMs: Long, endMs: Long, sumMs: Long, callback: FFmpegCallBck) {
 
-    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-    val outputName = "trimmedVideo_$timeStamp.mp4"
+    val fileName = UUID.randomUUID().toString().replace("", "")
+    val outputName = "trimmedVideo_$fileName.mp4"
 
     val start = convertSecondsToTime(startMs / 1000)
     val duration = convertSecondsToTime((endMs - startMs) / 1000)
@@ -33,15 +32,62 @@ fun trimVideo(context: Context, inputFile:String, outputFile:String, startMs:Lon
         FFmpeg.getInstance(context).execute(command, object : ExecuteBinaryResponseHandler() {
 
             override fun onStart() {
-                callback.onStartTrim()
+                callback.onStart()
             }
 
             override fun onProgress(message: String?) {
-                callback.onProgress(1)
+                log("FFmpeg-message", message!!)
+
+                val time = TimeUtil.time2ms(message)
+                if (time == 0L)
+                    return
+                val percent: Int = (time / sumMs * 100).toInt()
+                log("FFmpeg-trim", "$time:$sumMs:$percent")
+                callback.onProgress(percent)
             }
 
             override fun onSuccess(s: String?) {
-                callback.onFinishTrim()
+                callback.onFinish("$outputFile/$outputName")
+            }
+
+        })
+    } catch (e: FFmpegCommandAlreadyRunningException) {
+        e.printStackTrace()
+    }
+
+}
+
+
+fun compressVideo(context: Context, inputFile: String, width: Int, height: Int, outputFile: String, sumMs: Long, callback: FFmpegCallBck) {
+
+    val fileName = UUID.randomUUID().toString().replace("", "")
+    val outputName = "compressVideo_$fileName.mp4"
+
+
+    val outHeight: Int = (480.0 / width * height).toInt() / 10 * 10
+    val cmd = "-i $inputFile -vcodec libx264 -preset faster -crf 26 -y -vf scale=480:$outHeight -acodec libmp3lame -ab 32k $outputFile/$outputName"
+    val command = cmd.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+
+    try {
+        FFmpeg.getInstance(context).execute(command, object : ExecuteBinaryResponseHandler() {
+
+            override fun onStart() {
+                callback.onStart()
+            }
+
+            override fun onProgress(message: String?) {
+                log("FFmpeg-message", message!!)
+
+                val time = TimeUtil.time2ms(message)
+                if (time == 0L)
+                    return
+                val percent: Int = (time * 1.0 / sumMs * 100).toInt()
+                log("FFmpeg-compress", "$time:$sumMs:$percent")
+                callback.onProgress(percent)
+            }
+
+            override fun onSuccess(s: String?) {
+                callback.onFinish("$outputFile/$outputName")
             }
 
         })
@@ -54,9 +100,9 @@ fun trimVideo(context: Context, inputFile:String, outputFile:String, startMs:Lon
 
 private fun convertSecondsToTime(seconds: Long): String {
     val timeStr: String?
-    val hour:Int
-    var minute:Int
-    val second:Int
+    val hour: Int
+    var minute: Int
+    val second: Int
     if (seconds <= 0)
         return "00:00"
     else {

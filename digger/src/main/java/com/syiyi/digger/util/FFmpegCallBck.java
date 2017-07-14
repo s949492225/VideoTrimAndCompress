@@ -5,11 +5,11 @@ package com.syiyi.digger.util;
  * Created by songlintao on 2017/7/13.
  */
 
-public interface TrimCallBck {
+public interface FFmpegCallBck {
 
-    void onStartTrim();
+    void onStart();
 
     void onProgress(int msg);
 
-    void onFinishTrim();
+    void onFinish(String path);
 }

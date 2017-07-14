@@ -12,6 +12,44 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <RelativeLayout
+            android:id="@+id/toolBar"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:drawableLeft="@drawable/video_action_back"
+                android:gravity="center_vertical"
+                android:text="返回"
+                android:textColor="#fccc49" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:text="裁剪"
+                android:textColor="#fff"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/confirm"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:gravity="center"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:text="确定"
+                android:textColor="#fccc49"
+                android:textSize="14sp" />
+        </RelativeLayout>
+
         <FrameLayout
             android:id="@+id/play"
             android:layout_width="match_parent"
@@ -35,7 +73,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="35dp"
+            android:layout_height="45dp"
             android:paddingLeft="8dp"
             android:paddingRight="8dp">
 
@@ -44,7 +82,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:text="00:00:01"
+                android:text="00:00:00"
                 android:textColor="#cccbcb"
                 android:textSize="12sp" />
 
@@ -59,7 +97,7 @@
                     android:layout_height="wrap_content"
                     android:text="共"
                     android:textColor="#fff"
-                    android:textSize="14sp" />
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/trim_duration"
@@ -67,16 +105,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
-                    android:text="25"
+                    android:text="0"
                     android:textColor="#fff"
                     android:textSize="18sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="秒"
-                    android:textColor="#fff"
-                    android:textSize="14sp" />
             </LinearLayout>
 
             <TextView
@@ -85,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:text="00:00:15"
+                android:text="00:00:00"
                 android:textColor="#cccbcb"
                 android:textSize="12sp" />
         </RelativeLayout>
@@ -106,7 +138,6 @@
                 style="@style/Video_Trim_SeekBar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:max="1000000"
                 android:progressDrawable="@android:color/transparent"
                 android:secondaryProgress="0" />
 
@@ -118,36 +149,5 @@
 
     </LinearLayout>
 
-    <RelativeLayout
-        android:id="@+id/toolBar"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:gravity="center_vertical">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:src="@drawable/icon_back_drawable" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"
-            android:gravity="center"
-            android:text="裁剪"
-            android:textColor="#fff"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:gravity="center"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:text="确定"
-            android:textColor="#fccc49"
-            android:textSize="14sp" />
-    </RelativeLayout>
 </FrameLayout>
