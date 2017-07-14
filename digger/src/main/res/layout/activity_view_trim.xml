@@ -108,7 +108,7 @@
                 android:max="1000"
                 android:progressDrawable="@android:color/transparent"
                 android:secondaryProgress="0" />
-            <com.syiyi.digger.view.RangeSeekBar
+            <com.syiyi.digger.view.RangeSeekBar2
                 android:id="@+id/rangeSeekBar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

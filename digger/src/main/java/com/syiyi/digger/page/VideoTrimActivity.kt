@@ -14,6 +14,7 @@ import com.syiyi.digger.R
 import com.syiyi.digger.consts.Constrains.*
 import com.syiyi.digger.view.AutoSeekBar
 import com.syiyi.digger.view.RangeSeekBar
+import com.syiyi.digger.view.RangeSeekBar2
 import com.syiyi.digger.widget.TimeLineView
 import java.io.File
 
@@ -30,7 +31,7 @@ class VideoTrimActivity : AppCompatActivity() {
     var mPlayAction: View? = null
     var mPlayIcon: ImageView? = null
     var mSeekBar: AutoSeekBar? = null
-    var mRangeBar: RangeSeekBar? = null
+    var mRangeBar: RangeSeekBar2? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
