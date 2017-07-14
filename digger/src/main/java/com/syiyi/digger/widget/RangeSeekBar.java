@@ -199,6 +199,8 @@ public class RangeSeekBar extends View {
                 if (upperCenterX > width - bmpWidth / 2) {
                     upperCenterX = width - bmpWidth / 2;
                 }
+                updateRange();
+                postInvalidate();
                 break;
             default:
                 break;

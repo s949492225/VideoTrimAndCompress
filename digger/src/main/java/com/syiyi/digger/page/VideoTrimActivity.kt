@@ -1,7 +1,6 @@
 package com.syiyi.digger.page
 
 import android.graphics.BitmapFactory
-import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -20,6 +19,7 @@ import com.syiyi.digger.widget.VideoView
 import java.io.File
 import android.app.ProgressDialog
 import com.syiyi.digger.ex.FileEx
+import com.syiyi.digger.ex.log
 import com.syiyi.digger.util.*
 
 
@@ -77,19 +77,11 @@ class VideoTrimActivity : AppCompatActivity() {
         mVideoView!!.setOnPreparedListener({
             mVideoView!!.seekTo(0)
             mSeekBar!!.max = mVideoView!!.duration
-            mCurrentStart = 0
             mCurrentEnd = mVideoView!!.duration.toLong()
             mDuration = mVideoView!!.duration.toLong()
             setEndTime(mDuration)
             setSelectTimeSum(mDuration)
         })
-
-
-        mVideoView!!.setOnCompletionListener {
-            MediaPlayer.OnCompletionListener {
-                mVideoView!!.seekTo(mCurrentStart.toInt())
-            }
-        }
 
         mVideoView!!.setVideoURI(Uri.fromFile(File(mPath)))
     }
@@ -111,15 +103,20 @@ class VideoTrimActivity : AppCompatActivity() {
         mSeekBar!!.progress = 0
 
         mVideoView!!.setVideoPlayLister(object : VideoView.OnVideoPlayListener {
+            override fun onPause() {
+                setVisibility(mPlayIcon!!, View.VISIBLE)
+                setVisibility(mSeekBar!!, View.INVISIBLE)
+            }
+
             override fun onPlay(currentPosition: Int) {
                 if (currentPosition >= mCurrentEnd) {
-                    setVisibility(mPlayIcon!!, View.VISIBLE)
-                    setVisibility(mSeekBar!!, View.INVISIBLE)
                     mSeekBar!!.progress = mCurrentStart.toInt()
                     mVideoView!!.pause()
                     mVideoView!!.seekTo(mCurrentStart.toInt())
                 } else {
                     mSeekBar!!.progress = currentPosition
+                    setVisibility(mPlayIcon!!, View.INVISIBLE)
+                    setVisibility(mSeekBar!!, View.VISIBLE)
                 }
             }
 
@@ -127,12 +124,12 @@ class VideoTrimActivity : AppCompatActivity() {
 
 
         mRangeBar!!.setRangeChangeListener { startPercent, endPercent, selectPercent ->
+            log("xxx","$startPercent")
             mCurrentStart = (mDuration * startPercent).toLong()
             mCurrentEnd = (mDuration * endPercent).toLong()
             mVideoView!!.pause()
-            setVisibility(mPlayIcon!!, View.VISIBLE)
-            setVisibility(mSeekBar!!, View.INVISIBLE)
             mVideoView!!.seekTo(mCurrentStart.toInt())
+            mSeekBar!!.progress = mCurrentStart.toInt()
             setStartTime(mCurrentStart)
             setEndTime(mCurrentEnd)
             setSelectTimeSum((selectPercent * mDuration).toLong())
@@ -154,12 +151,8 @@ class VideoTrimActivity : AppCompatActivity() {
     private fun videoPlayOrPause() {
         if (mVideoView!!.isPlaying) {
             mVideoView!!.pause()
-            setVisibility(mPlayIcon!!, View.VISIBLE)
-            setVisibility(mSeekBar!!, View.INVISIBLE)
         } else {
             mVideoView!!.start()
-            setVisibility(mPlayIcon!!, View.INVISIBLE)
-            setVisibility(mSeekBar!!, View.VISIBLE)
         }
     }
 

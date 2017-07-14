@@ -18,14 +18,19 @@ class VideoView(context: Context?, attrs: AttributeSet?) : VideoView(context, at
     }
 
     fun runListener() {
-        post({
+        postDelayed({
             if (!stop) {
-                if (duration > 0 && isPlaying) {
-                    mVideoPlayListener!!.onPlay(currentPosition)
+                if (duration>0) {
+
+                    if (isPlaying) {
+                        mVideoPlayListener!!.onPlay(currentPosition)
+                    } else {
+                        mVideoPlayListener!!.onPause()
+                    }
                 }
                 runListener()
             }
-        })
+        },10)
     }
 
 
@@ -36,6 +41,8 @@ class VideoView(context: Context?, attrs: AttributeSet?) : VideoView(context, at
 
     interface OnVideoPlayListener {
         fun onPlay(currentPosition: Int)
+
+        fun onPause()
     }
 
     override fun onDetachedFromWindow() {
