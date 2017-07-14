@@ -39,7 +39,7 @@ import iknow.android.utils.thread.BackgroundExecutor;
 import iknow.android.utils.thread.UiThreadExecutor;
 
 public class TimeLineView extends View {
-
+    private final int DOUBLE_TIMES = 2;
     private Uri mVideoUri;
     private int mHeightView;
     private LongSparseArray<Bitmap> mBitmapList = null;
@@ -95,6 +95,7 @@ public class TimeLineView extends View {
                                                final int thumbHeight = mHeightView;
 
                                                int thumbsNum = (int) Math.ceil(((float) viewWidth) / thumbWidth);
+                                               thumbsNum = thumbsNum * DOUBLE_TIMES;
 
                                                final long interval = videoLengthInMs / thumbsNum;
 
@@ -102,7 +103,7 @@ public class TimeLineView extends View {
                                                    Bitmap bitmap = mediaMetadataRetriever.getFrameAtTime(i * interval, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
                                                    // TODO: bitmap might be null here, hence throwing NullPointerException. You were right
                                                    try {
-                                                       bitmap = Bitmap.createScaledBitmap(bitmap, thumbWidth, thumbHeight, false);
+                                                       bitmap = Bitmap.createScaledBitmap(bitmap, thumbWidth / DOUBLE_TIMES, thumbHeight, false);
                                                    } catch (Exception e) {
                                                        e.printStackTrace();
                                                    }
