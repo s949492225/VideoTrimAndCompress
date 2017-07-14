@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -27,7 +25,6 @@ import com.syiyi.digger.util.MediaInfoUtilKt;
 import java.util.ArrayList;
 import java.util.List;
 
-import iknow.android.utils.DeviceUtil;
 
 /**
  * Author：J.Chou
@@ -78,7 +75,6 @@ public class VideoSelectActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
 
         requestPermission();
-//        requestData();
     }
 
     private void requestData() {
@@ -155,38 +151,7 @@ public class VideoSelectActivity extends AppCompatActivity {
         if (mVideoInfo == null) return;
         Intent intent = new Intent(this, VideoTrimActivity.class);
         intent.putExtra(Constrains.VIDEO_PATH, mVideoInfo.getVideoPath());
-        intent.putExtra(Constrains.VIDEO_DURATION, mVideoInfo.calcDuration().getDuration());
-        int[] whScale = calculateThumbScale();
-        intent.putExtra(Constrains.VIDEO_WIDTH, whScale[0]);
-        intent.putExtra(Constrains.VIDEO_HEIGHT, whScale[1]);
         this.startActivity(intent);
-    }
-
-    private int[] calculateThumbScale() {
-        Bitmap bitmap = getThumbBitmap();
-        int deviceWidth = DeviceUtil.getDeviceWidth();
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        double scale = height / THUMB_HEIGHT;
-        if (scale == 0) return new int[]{0, 0};
-        int realWidth = (int) (width / scale);
-        if (realWidth == 0) return new int[]{0, 0};
-
-        int num = deviceWidth % realWidth;
-        if (deviceWidth % realWidth != 0) {
-            num = num + 1;
-        }
-        realWidth = deviceWidth / num;
-        int realHeight = height * realWidth / width;
-        return new int[]{width, height};
-    }
-
-    private final int THUMB_HEIGHT = 50;
-
-    private Bitmap getThumbBitmap() {
-        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-        mediaMetadataRetriever.setDataSource(mVideoInfo.getVideoPath());
-        return mediaMetadataRetriever.getFrameAtTime();
     }
 
     @Override

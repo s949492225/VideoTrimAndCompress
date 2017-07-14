@@ -32,17 +32,14 @@ import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.LongSparseArray;
 import android.view.View;
-
-import com.syiyi.digger.R;
-
 import iknow.android.utils.thread.BackgroundExecutor;
 import iknow.android.utils.thread.UiThreadExecutor;
 
 public class TimeLineView extends View {
-    private final int DOUBLE_TIMES = 2;
 
     private Uri mVideoUri;
     private int mHeightView;
+    private int mWidth;
     private LongSparseArray<Bitmap> mBitmapList = null;
 
     public TimeLineView(@NonNull Context context, AttributeSet attrs) {
@@ -55,7 +52,6 @@ public class TimeLineView extends View {
     }
 
     private void init() {
-        mHeightView = getContext().getResources().getDimensionPixelOffset(R.dimen.frames_video_height);
     }
 
     @Override
@@ -63,10 +59,12 @@ public class TimeLineView extends View {
         final int minW = getPaddingLeft() + getPaddingRight() + getSuggestedMinimumWidth();
         int w = resolveSizeAndState(minW, widthMeasureSpec, 1);
 
-        final int minH = getPaddingBottom() + getPaddingTop() + mHeightView;
+        final int minH = getPaddingBottom() + getPaddingTop() + getSuggestedMinimumHeight();
         int h = resolveSizeAndState(minH, heightMeasureSpec, 1);
 
         setMeasuredDimension(w, h);
+        mWidth=getMeasuredWidth();
+        mHeightView=getMeasuredHeight();
     }
 
     @Override
@@ -89,22 +87,31 @@ public class TimeLineView extends View {
                                                mediaMetadataRetriever.setDataSource(getContext(), mVideoUri);
 
                                                // Retrieve media data
-                                               long videoLengthInMs = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) * 1000;
+                                               long videoLengthInMs = Integer.valueOf(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))* 1000;
+                                               Bitmap bitmap = mediaMetadataRetriever.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
 
-                                               // Set thumbnail properties (Thumbs are squares)
-                                               final int thumbWidth = mHeightView;
+                                               final int bitmapWidth= bitmap.getWidth();
+                                               final int bitmapHeight= bitmap.getHeight();
+
                                                final int thumbHeight = mHeightView;
+                                               int thumbWidth = (int) (mHeightView*1.0/bitmapHeight*bitmapWidth);
 
                                                int thumbsNum = (int) Math.ceil(((float) viewWidth) / thumbWidth);
-                                               thumbsNum = thumbsNum * DOUBLE_TIMES;
+
+                                               thumbWidth=mWidth/thumbsNum;
 
                                                final long interval = videoLengthInMs / thumbsNum;
 
                                                for (int i = 0; i < thumbsNum; ++i) {
-                                                   Bitmap bitmap = mediaMetadataRetriever.getFrameAtTime(i * interval, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
-                                                   // TODO: bitmap might be null here, hence throwing NullPointerException. You were right
+                                                   if (i!=0) {
+                                                       bitmap = mediaMetadataRetriever.getFrameAtTime(i * interval, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+                                                   }
                                                    try {
-                                                       bitmap = Bitmap.createScaledBitmap(bitmap, thumbWidth / DOUBLE_TIMES, thumbHeight, false);
+                                                       if (i==thumbsNum-1){
+                                                           bitmap = Bitmap.createScaledBitmap(bitmap, mWidth-thumbWidth*(thumbsNum-1), thumbHeight, false);
+                                                       }else {
+                                                           bitmap = Bitmap.createScaledBitmap(bitmap, thumbWidth, thumbHeight, false);
+                                                       }
                                                    } catch (Exception e) {
                                                        e.printStackTrace();
                                                    }
@@ -113,6 +120,8 @@ public class TimeLineView extends View {
                                                }
 
                                                mediaMetadataRetriever.release();
+
+
                                            } catch (final Throwable e) {
                                                Thread.getDefaultUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
                                            }

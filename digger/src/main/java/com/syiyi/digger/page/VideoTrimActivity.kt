@@ -51,11 +51,7 @@ class VideoTrimActivity : AppCompatActivity() {
     }
 
     private fun getVideoInfo() {
-        mDuration = intent.getLongExtra(VIDEO_DURATION, 0)
-        mWidth = intent.getIntExtra(VIDEO_WIDTH, 0)
-        mHeight = intent.getIntExtra(VIDEO_HEIGHT, 0)
         mPath = intent.getStringExtra(VIDEO_PATH)
-
     }
 
     private fun setUI() {
@@ -76,9 +72,13 @@ class VideoTrimActivity : AppCompatActivity() {
 
         mVideoView!!.setOnPreparedListener({
             mVideoView!!.seekTo(0)
-            mSeekBar!!.max = mVideoView!!.duration
-            mCurrentEnd = mVideoView!!.duration.toLong()
             mDuration = mVideoView!!.duration.toLong()
+            mWidth = mVideoView!!.width
+            mHeight = mVideoView!!.height
+
+            mSeekBar!!.max = mDuration.toInt()
+            mCurrentEnd = mDuration
+
             setEndTime(mDuration)
             setSelectTimeSum(mDuration)
         })
@@ -124,7 +124,7 @@ class VideoTrimActivity : AppCompatActivity() {
 
 
         mRangeBar!!.setRangeChangeListener { startPercent, endPercent, selectPercent ->
-            log("xxx","$startPercent")
+            log("xxx", "$startPercent")
             mCurrentStart = (mDuration * startPercent).toLong()
             mCurrentEnd = (mDuration * endPercent).toLong()
             mVideoView!!.pause()
