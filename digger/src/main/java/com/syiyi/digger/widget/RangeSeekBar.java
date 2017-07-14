@@ -1,5 +1,6 @@
-package com.syiyi.digger.view;
+package com.syiyi.digger.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,13 +19,12 @@ import com.syiyi.digger.util.DeviceUtil;
 /**
  * Description: 实现范围滑杠选择器(RangeSeekBar)。 SeekBar上有两个滑块，一个选择最小值，一个选择最大值，从而选择了一个范围(range)。
  */
-public class RangeSeekBar2 extends View {
+public class RangeSeekBar extends View {
 
 
     private Bitmap lowerBmp;
     private Bitmap upperBmp;
     private int bmpWidth;
-    private int bmpHeight;
     private int lowerCenterX;
     private int upperCenterX;
     private Paint mPaint;
@@ -36,19 +36,20 @@ public class RangeSeekBar2 extends View {
     private static final int LINE_HEIGHT = 2;
     private boolean isLowerMoving;
     private boolean isUpperMoving;
+    private OnRangeChangeListener mRangeChangeListner;
 
-    public RangeSeekBar2(Context context) {
+    public RangeSeekBar(Context context) {
         super(context);
         init();
 
     }
 
-    public RangeSeekBar2(Context context, AttributeSet attrs) {
+    public RangeSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public RangeSeekBar2(Context context, AttributeSet attrs, int defStyle) {
+    public RangeSeekBar(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
@@ -76,7 +77,6 @@ public class RangeSeekBar2 extends View {
             upperBmp = resizeBitmap(R.drawable.video_trim_handle, getMeasuredHeight());
 
             bmpWidth = upperBmp.getWidth();
-            bmpHeight = upperBmp.getHeight();
 
             lowerCenterX = bmpWidth / 2;
             upperCenterX = getMeasuredWidth() - bmpWidth / 2;
@@ -130,6 +130,7 @@ public class RangeSeekBar2 extends View {
 
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         super.onTouchEvent(event);
@@ -145,7 +146,7 @@ public class RangeSeekBar2 extends View {
                 }
 
                 // 表示当前按下的滑块是左边的滑块
-                if (Math.abs(xPos - lowerCenterX) <=bmpWidth / 2) {
+                if (Math.abs(xPos - lowerCenterX) <= bmpWidth / 2) {
                     isLowerMoving = true;
                 }
 
@@ -192,6 +193,12 @@ public class RangeSeekBar2 extends View {
                 // 修改滑块的滑动状态为不再滑动
                 isLowerMoving = false;
                 isUpperMoving = false;
+                if (lowerCenterX < bmpWidth / 2) {
+                    lowerCenterX = bmpWidth / 2;
+                }
+                if (upperCenterX > width - bmpWidth / 2) {
+                    upperCenterX = width - bmpWidth / 2;
+                }
                 break;
             default:
                 break;
@@ -201,8 +208,24 @@ public class RangeSeekBar2 extends View {
     }
 
     private void updateRange() {
-
+        int sum = getMeasuredWidth() - bmpWidth * 2;
+        float start = (lowerCenterX - bmpWidth / 2) * 1.0f / sum;
+        float end = (upperCenterX - bmpWidth * 1.5f) * 1.0f / sum;
+        float selectPercent = end - start;
+        if (selectPercent < 0) {
+            selectPercent = 0f;
+        }
+        if (mRangeChangeListner != null) {
+            mRangeChangeListner.onChange(start, end, selectPercent);
+        }
     }
 
+    public void setRangeChangeListener(OnRangeChangeListener listener) {
+        mRangeChangeListner = listener;
+    }
+
+    public interface OnRangeChangeListener {
+        void onChange(float startPercent, float endPercent, float selectPercent);
+    }
 
 }

@@ -18,7 +18,7 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <VideoView
+            <com.syiyi.digger.widget.VideoView
                 android:id="@+id/video"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -92,7 +92,8 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/frames_video_height">
+            android:layout_height="@dimen/frames_video_height"
+            android:layout_marginBottom="16dp">
 
 
             <com.syiyi.digger.widget.TimeLineView
@@ -100,15 +101,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/frames_video_height" />
 
-            <com.syiyi.digger.view.AutoSeekBar
+            <android.support.v7.widget.AppCompatSeekBar
                 android:id="@+id/seek_bar"
                 style="@style/Video_Trim_SeekBar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:max="1000"
+                android:max="1000000"
                 android:progressDrawable="@android:color/transparent"
                 android:secondaryProgress="0" />
-            <com.syiyi.digger.view.RangeSeekBar2
+
+            <com.syiyi.digger.widget.RangeSeekBar
                 android:id="@+id/rangeSeekBar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
