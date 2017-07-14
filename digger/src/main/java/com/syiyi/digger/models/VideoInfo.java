@@ -42,6 +42,8 @@ public class VideoInfo implements Serializable, Cloneable {
 
     private String lon;
 
+    private boolean selected;
+
     public long getVideoId() {
         return videoId;
     }
@@ -120,6 +122,14 @@ public class VideoInfo implements Serializable, Cloneable {
 
     public void setDuration(long duration) {
         this.duration = duration;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean getSelected() {
+        return selected;
     }
 
     public static VideoInfo buildVideo(Context context, String videoPath) {

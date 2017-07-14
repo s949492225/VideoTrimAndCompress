@@ -25,9 +25,9 @@ import com.syiyi.digger.models.VideoInfo;
 import com.syiyi.digger.util.MediaInfoUtilKt;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import iknow.android.utils.DeviceUtil;
-import iknow.android.utils.callback.SingleCallback;
 
 /**
  * Author：J.Chou
@@ -37,7 +37,7 @@ import iknow.android.utils.callback.SingleCallback;
  */
 public class VideoSelectActivity extends AppCompatActivity {
     private static final int REQUEST_STORAGE_READ_ACCESS_PERMISSION = 101;
-    private ArrayList<VideoInfo> mDatas;
+    private List<VideoInfo> mDatas = new ArrayList<>();
     private TextView mBtnNext;
     private VideoInfo mVideoInfo;
     private VideoGridViewAdapter mAdapter;
@@ -63,24 +63,44 @@ public class VideoSelectActivity extends AppCompatActivity {
         });
         btnSelected(false);
 
-        requestPermission();
-    }
-
-    private void requestData() {
-        mDatas = MediaInfoUtilKt.getAllVideoFile(this);
         mAdapter = new VideoGridViewAdapter(this, mDatas);
+        mAdapter.setOnClickListener(new VideoGridViewAdapter.OnClickListener() {
+            @Override
+            public void onClick(int pos) {
+                refreshData(pos);
+            }
+        });
         GridLayoutManager layoutManager = new GridLayoutManager(this, 4);
         RecyclerView recyclerView = findViewById(R.id.recycle_view);
         recyclerView.addItemDecoration(new SpacesItemDecoration(5));
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(mAdapter);
         recyclerView.setLayoutManager(layoutManager);
-        mAdapter.setItemClickCallback(new SingleCallback<Boolean, VideoInfo>() {
-            @Override
-            public void onSingleCallback(Boolean isSelected, VideoInfo video) {
-                selectedItem(isSelected, video);
+
+        requestPermission();
+//        requestData();
+    }
+
+    private void requestData() {
+        mDatas.clear();
+        mDatas.addAll(MediaInfoUtilKt.getAllVideoFile(this));
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private void refreshData(int pos) {
+        if (mDatas == null) return;
+        for (int i = 0; i < mDatas.size(); i++) {
+            VideoInfo info = mDatas.get(i);
+            if (pos == i) {
+                if (!info.getSelected()) {
+                    info.setSelected(true);
+                    mVideoInfo = info;
+                    btnSelected(true);
+                }
+            } else {
+                info.setSelected(false);
             }
-        });
+        }
         mAdapter.notifyDataSetChanged();
     }
 
@@ -122,13 +142,6 @@ public class VideoSelectActivity extends AppCompatActivity {
                 break;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    private void selectedItem(boolean selected, VideoInfo video) {
-        if (video != null) {
-            mVideoInfo = video;
-            btnSelected(selected);
         }
     }
 
