@@ -20,6 +20,7 @@ import com.syiyi.digger.widget.TimeLineView
 import com.syiyi.digger.widget.VideoView
 import java.io.File
 import android.app.ProgressDialog
+import android.media.MediaMetadataRetriever
 import com.syiyi.digger.ex.FileEx
 import com.syiyi.digger.util.*
 
@@ -62,6 +63,7 @@ class VideoTrimActivity : AppCompatActivity() {
     private fun setUI() {
         setUpToolBar()
         setTimeLine()
+        setVideoInfo()
 
         mVideoView = findViewById(R.id.video)
         mTrimStartText = findViewById(R.id.trim_start)
@@ -77,18 +79,32 @@ class VideoTrimActivity : AppCompatActivity() {
 
         mVideoView!!.setOnPreparedListener({
             mVideoView!!.seekTo(0)
-            mDuration = mVideoView!!.duration.toLong()
-            mWidth = mVideoView!!.width
-            mHeight = mVideoView!!.height
-
-            mSeekBar!!.max = mDuration.toInt()
-            mCurrentEnd = mDuration
-
-            setEndTime(mDuration)
-            setSelectTimeSum(mDuration)
         })
 
         mVideoView!!.setVideoURI(Uri.fromFile(File(mPath)))
+    }
+
+    private fun setVideoInfo() {
+        Thread(Runnable {
+            val retriever = MediaMetadataRetriever()
+            retriever.setDataSource(mPath)
+            mDuration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toLong()
+            val rotation = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION).toInt()
+            if (rotation / 90 % 2 != 0) {
+                mWidth = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT).toInt()
+                mHeight = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH).toInt()
+            } else {
+                mWidth = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH).toInt()
+                mHeight = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT).toInt()
+            }
+            mCurrentEnd = mDuration
+            runOnUiThread {
+                mSeekBar!!.max = mDuration.toInt()
+                setEndTime(mDuration)
+                setSelectTimeSum(mDuration)
+            }
+
+        }).start()
     }
 
     private fun setSeekBar() {

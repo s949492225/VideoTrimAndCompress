@@ -25,7 +25,6 @@ public class Digger {
 
     public static void init(Application app, File outputDir) {
         mOutputPath = outputDir.getPath();
-        FileEx.createDir(outputDir);
         mContext = app.getApplicationContext();
         initFFmpegBinary();
     }

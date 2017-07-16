@@ -65,9 +65,9 @@ fun compressVideo(context: Context, inputFile: String, width: Int, height: Int, 
 
 //    ffmpeg -i input -c:v libx264 -preset ultrafast -crf 0 output.mkv
 
-    val outHeight: Int = (320.0 / width * height).toInt() / 10 * 10
+    val outHeight: Int = (480.0 / width * height).toInt() / 10 * 10
 //    val cmd = "-i $inputFile -vcodec libx264 -preset ultrafast -crf 26 -y -vf scale=480:$outHeight -acodec libmp3lame -ab 32k $outputFile/$outputName"
-    val cmd = "-threads 8 -i $inputFile -c:v libx264 -preset ultrafast -crf 26 -y -vf scale=320:$outHeight $outputFile/$outputName"
+    val cmd = "-threads 2 -i $inputFile -c:v libx264 -preset veryfast -crf 26 -y -vf scale=480:$outHeight -c:a copy $outputFile/$outputName"
     val command = cmd.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
     try {

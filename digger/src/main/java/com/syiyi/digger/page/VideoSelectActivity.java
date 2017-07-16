@@ -19,9 +19,12 @@ import android.widget.Toast;
 import com.syiyi.digger.R;
 import com.syiyi.digger.consts.Constrains;
 import com.syiyi.digger.decoration.SpacesItemDecoration;
+import com.syiyi.digger.ex.FileEx;
+import com.syiyi.digger.init.Digger;
 import com.syiyi.digger.models.VideoInfo;
 import com.syiyi.digger.util.MediaInfoUtilKt;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,6 +81,7 @@ public class VideoSelectActivity extends AppCompatActivity {
     }
 
     private void requestData() {
+        FileEx.createDir(new File(Digger.mOutputPath));
         mDatas.clear();
         mDatas.addAll(MediaInfoUtilKt.getAllVideoFile(this));
         mAdapter.notifyDataSetChanged();
