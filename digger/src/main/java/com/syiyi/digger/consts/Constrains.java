@@ -14,4 +14,7 @@ public class Constrains {
     public static final String VIDEO_HEIGHT = "VIDEO_HEIGHT";
     public static final String VIDEO_DURATION = "VIDEO_DURATION";
     public static final String VIDEO_PATH = "VIDEO_PATH";
+
+    public static final int REQUEST_CODE_PICK_VIDEO = 0x1120;
+    public static final int REQUEST_CODE_EDIT_VIDEO = 0x1121;
 }

@@ -2,6 +2,7 @@
 
 package com.syiyi.digger.page
 
+import android.app.Activity
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -20,7 +21,9 @@ import com.syiyi.digger.widget.TimeLineView
 import com.syiyi.digger.widget.VideoView
 import java.io.File
 import android.app.ProgressDialog
+import android.content.Intent
 import android.media.MediaMetadataRetriever
+import com.syiyi.digger.consts.Constrains
 import com.syiyi.digger.ex.FileEx
 import com.syiyi.digger.util.*
 
@@ -219,6 +222,10 @@ class VideoTrimActivity : AppCompatActivity() {
                     override fun onFinish(output: String?) {
                         dialog.dismiss()
                         FileEx.delete(path)
+                        val intent = Intent()
+                        intent.putExtra(Constrains.VIDEO_PATH, path)
+                        setResult(Activity.RESULT_OK, intent)
+                        finish()
                     }
 
                     override fun onProgress(msg: Int) {
@@ -241,6 +248,11 @@ class VideoTrimActivity : AppCompatActivity() {
             }
         })
 
+    }
+
+    override fun onBackPressed() {
+        setResult(Activity.RESULT_CANCELED)
+        finish()
     }
 
     private fun setTimeLine() {

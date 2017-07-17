@@ -4,16 +4,18 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.syiyi.digger.R;
@@ -38,7 +40,6 @@ import java.util.List;
 public class VideoSelectActivity extends AppCompatActivity {
     private static final int REQUEST_STORAGE_READ_ACCESS_PERMISSION = 101;
     private List<VideoInfo> mDatas = new ArrayList<>();
-    private TextView mBtnNext;
     private VideoInfo mVideoInfo;
     private VideoGridViewAdapter mAdapter;
 
@@ -46,22 +47,16 @@ public class VideoSelectActivity extends AppCompatActivity {
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.video_select_layout);
+        Toolbar mToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        setTitle("选择视频");
+        ActionBar actionBar = getSupportActionBar();
 
-        ImageView btnBack = findViewById(R.id.btn_back);
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
-        mBtnNext = findViewById(R.id.next_step);
-        mBtnNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                nextPage();
-            }
-        });
-        btnSelected(false);
+        assert actionBar != null;
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            actionBar.setElevation(25);
+        }
 
         mAdapter = new VideoGridViewAdapter(this, mDatas);
         mAdapter.setOnClickListener(new VideoGridViewAdapter.OnClickListener() {
@@ -95,7 +90,6 @@ public class VideoSelectActivity extends AppCompatActivity {
                 if (!info.getSelected()) {
                     info.setSelected(true);
                     mVideoInfo = info;
-                    btnSelected(true);
                 }
             } else {
                 info.setSelected(false);
@@ -145,17 +139,52 @@ public class VideoSelectActivity extends AppCompatActivity {
         }
     }
 
-    private void btnSelected(boolean selected) {
-        mBtnNext.setEnabled(selected);
-        mBtnNext.setTextAppearance(VideoSelectActivity.this, selected ? R.style
-                .blue_text_18_style : R.style.gray_text_18_style);
-    }
-
     private void nextPage() {
-        if (mVideoInfo == null) return;
+        if (mVideoInfo == null) {
+            Toast.makeText(this, "请先选择视频", Toast.LENGTH_LONG).show();
+            return;
+        }
         Intent intent = new Intent(this, VideoTrimActivity.class);
         intent.putExtra(Constrains.VIDEO_PATH, mVideoInfo.getVideoPath());
-        this.startActivity(intent);
+        this.startActivityForResult(intent, Constrains.REQUEST_CODE_EDIT_VIDEO);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode != RESULT_OK)
+            return;
+        String path = data.getStringExtra(Constrains.VIDEO_PATH);
+        Intent intent = new Intent();
+        intent.putExtra(Constrains.VIDEO_PATH, path);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.select_menu, menu);
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            super.onBackPressed();
+            return true;
+        }
+
+        if (item.getItemId() == R.id.done) {
+            nextPage();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

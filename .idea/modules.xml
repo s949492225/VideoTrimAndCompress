@@ -3,8 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/VideoTrimAndCompress.iml" filepath="$PROJECT_DIR$/VideoTrimAndCompress.iml" />
+      <module fileurl="file://D:\androidWorkSpace\VideoTrimAndCompress\VideoTrimAndCompress.iml" filepath="D:\androidWorkSpace\VideoTrimAndCompress\VideoTrimAndCompress.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://D:\androidWorkSpace\VideoTrimAndCompress\app\app.iml" filepath="D:\androidWorkSpace\VideoTrimAndCompress\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/digger/digger.iml" filepath="$PROJECT_DIR$/digger/digger.iml" />
+      <module fileurl="file://D:\androidWorkSpace\VideoTrimAndCompress\digger\digger.iml" filepath="D:\androidWorkSpace\VideoTrimAndCompress\digger\digger.iml" />
     </modules>
   </component>
 </project>
